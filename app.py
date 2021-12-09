@@ -20,53 +20,118 @@ def home():
     # render a view
     return render_template("pages/home.html",homeIsActive=True,addNoteIsActive=False,notes=notes)
 
-@app.route("/add-note", methods=['GET','POST'])
+@app.route("/add-estadistica", methods=['GET','POST'])
 def addNote():
     if(request.method == "GET"):
 
-        return render_template("pages/add-note.html",homeIsActive=False,addNoteIsActive=True)
+        return render_template("pages/add-estadistica.html",homeIsActive=False,addNoteIsActive=True)
 
     elif (request.method == "POST"):
 
         # get the fields data
-        title = request.form['title']
-        description = request.form['description']
-        createdAt = datetime.datetime.now()
+        name = request.form['name']
+        value = request.form['value']
+        total = request.form['total']
 
         # save the record to the database
-        mongo.db.notes.insert_one({"title":title,"description":description,"createdAt":createdAt})
+        mongo.db.notes.insert_one({"name":name,"value":value,"total":total})
 
         # redirect to home page
         return redirect("/")
 
-@app.route('/edit-note', methods=['GET','POST'])
-def editNote():
+@app.route('/tiempo-alistamiento', methods=['GET','POST'])
+def editNoteTiempo():
 
     if request.method == "GET":
-
-        # get the id of the note to edit
-        noteId = request.args.get('form')
         
         # get the note details from the db
-        note = dict(mongo.db.notes.find_one({"_id":ObjectId(noteId)}))
+        note = dict(mongo.db.notes.find_one({"_id":ObjectId("61b168746eee466439866f81")}))
 
         # direct to edit note page
-        return render_template('pages/edit-note.html',note=note)
+        return render_template('pages/edit-tiempo.html',note=note)
 
     elif request.method == "POST":
 
         #get the data of the note
-        print( 'request', request.text )
-        noteId = request.form['_id']
-        title = request.form['title']
-        description = request.form['description']
+        newValue = request.form['value']
+        
+        # get the note details from the db
+        note = dict(mongo.db.notes.find_one({"_id":ObjectId("61b168746eee466439866f81")}))
+        total = int(note['total']) + 1
+        value = ((int(note['total']) * int(note['value'])) + int(newValue)) / total
+        
         # update the data in the db
-        mongo.db.notes.update_one({"_id":ObjectId(noteId)},{"$set":{"title":title,"description":description}})
+        mongo.db.notes.update_one({"_id":ObjectId("61b168746eee466439866f81")},{"$set":{"value":value, "total": total }})
 
         # redirect to home page
         return redirect("/")
+    
+@app.route('/tiempo-alistamiento/<val>', methods=['GET','POST'])
+def editNoteTiempoParam(val):
 
-@app.route('/delete-note', methods=['POST'])
+    #get the data of the note
+    newValue = val
+    
+    # get the note details from the db
+    note = dict(mongo.db.notes.find_one({"_id":ObjectId("61b168746eee466439866f81")}))
+
+    total = int(note['total']) + 1
+    value = ((int(note['total']) * int(note['value'])) + int(newValue)) / total
+    
+    # update the data in the db
+    mongo.db.notes.update_one({"_id":ObjectId("61b168746eee466439866f81")},{"$set":{"value":value, "total": total }})
+
+    # redirect to home page
+    return redirect("/")
+    
+    
+@app.route('/precio', methods=['GET','POST'])
+def editNotePrecio():
+
+    if request.method == "GET":
+        
+        # get the note details from the db
+        note = dict(mongo.db.notes.find_one({"_id":ObjectId("61b169780ca1b60f1c3b4dc7")}))
+
+        # direct to edit note page
+        return render_template('pages/edit-precio.html',note=note)
+
+    elif request.method == "POST":
+
+        #get the data of the note
+        newValue = request.form['value']
+        
+        # get the note details from the db
+        note = dict(mongo.db.notes.find_one({"_id":ObjectId("61b169780ca1b60f1c3b4dc7")}))
+
+        total = int(note['total']) + 1
+        value = ((int(note['total']) * int(note['value'])) + int(newValue)) / total
+        
+        # update the data in the db
+        mongo.db.notes.update_one({"_id":ObjectId("61b169780ca1b60f1c3b4dc7")},{"$set":{"value":value, "total": total }})
+
+        # redirect to home page
+        return redirect("/")
+    
+@app.route('/precio/<val>', methods=['GET','POST'])
+def editNotePrecioParam(val):
+
+    #get the data of the note
+    newValue = val
+    
+    # get the note details from the db
+    note = dict(mongo.db.notes.find_one({"_id":ObjectId("61b169780ca1b60f1c3b4dc7")}))
+
+    total = int(note['total']) + 1
+    value = ((int(note['total']) * int(note['value'])) + int(newValue)) / total
+    
+    # update the data in the db
+    mongo.db.notes.update_one({"_id":ObjectId("61b169780ca1b60f1c3b4dc7")},{"$set":{"value":value, "total": total }})
+
+    # redirect to home page
+    return redirect("/")
+
+@app.route('/delete', methods=['POST'])
 def deleteNote():
 
     # get the id of the note to delete
